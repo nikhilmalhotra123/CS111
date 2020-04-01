@@ -1,3 +1,7 @@
+//NAME: Nikhil Malhotra
+//EMAIL: nikhilmalhotra@g.ucla.edu
+//ID: 505103892
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <getopt.h>
@@ -74,13 +78,13 @@ int main(int argc, char **argv) {
         exit(1);
       }
   }
+  if (catch_flag) {
+    signal(SIGSEGV, signal_handler);
+  }
   if (seg_flag) {
-    if (catch_flag) {
-      signal(SIGSEGV, signal_handler);
-    }
     cause_seg();
-    //char* thing = NULL;
-    //printf("%c", *thing);
+    char* thing = NULL;
+    printf("%c", *thing);
   }
   char buf;
   size_t size;

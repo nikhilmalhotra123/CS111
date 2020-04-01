@@ -2,4 +2,21 @@ NAME: Nikhil Malhotra
 EMAIL: nikhilmalhotra@g.ucla.edu
 ID: 505103892
 
-tests
+lab0.c:
+This file copies standard input to standard output with the option to specify input and output files. There is also any option to force a segmentation fault as well as catch that fault.
+
+Makefile:
+This contains commands that can compile lab0.c, run it, compress all files into a tarball, and cleanup files.
+
+backtrace.png:
+This picture shows the gdb output of a backtrace after the segmentation fault occurs
+
+breakpoint.png:
+This picture shows the use of gdb to verify the pointer causing the segmentation fault is NULL.
+
+smoketest.sh:
+This bash file contains a series of smoke tests to verify lab0.c does what it is supposed to. Tests include:
+  - Verifying the input copies correctly to the output with standard input/output and specified files for input/output
+  - The program forces a segfault when it is supposed to
+  - The program handles the segfault when --catch is specified
+  - Verifying the correct exit codes are returned when the program succeeds without issue and when it fails due to bad arguments
