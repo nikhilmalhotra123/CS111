@@ -1,6 +1,6 @@
 all: build
 
-build:
+build: clean
 	gcc lab0.c -o lab0 -g -Wall -Wextra
 
 check: build
@@ -13,4 +13,4 @@ clean:
 	-rm lab0-505103892.tar.gz
 
 dist:
-	tar -czf lab0-505103892.tar.gz lab0.c Makefile README
+	tar -cvzf lab0-505103892.tar.gz lab0.c Makefile README

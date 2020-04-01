@@ -4,11 +4,18 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#include <signal.h>
+#include <unistd.h>
 
 void signal_handler() {
     signal(SIGSEGV, SIG_DFL);
     fprintf(stderr, "Segmentation fault due to segfault flag: %s\n", strerror(errno));
     exit(4);
+}
+
+void cause_seg() {
+	char* thing = NULL;
+	char b = *thing;
 }
 
 int main(int argc, char **argv) {
@@ -24,7 +31,7 @@ int main(int argc, char **argv) {
         {0, 0, 0, 0}
     };
     int option_index = 0;
-    c = getopt_long (argc, argv, "i:o:", long_options, &option_index);
+    c = getopt_long(argc, argv, "i:o:", long_options, &option_index);
     if (c == -1)
         break;
 
@@ -70,12 +77,13 @@ int main(int argc, char **argv) {
     if (catch_flag) {
       signal(SIGSEGV, signal_handler);
     }
-    char* thing = NULL;
-    printf("%c", *thing);
+    cause_seg();
+    //char* thing = NULL;
+    //printf("%c", *thing);
   }
   char buf;
   size_t size;
-  while ((size = read(0, &buf, 5)) > 0) {
+  while ((size = read(0, &buf, 1)) > 0) {
     write(1, &buf, size);
   }
 }
