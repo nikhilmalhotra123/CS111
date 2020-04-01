@@ -16,6 +16,7 @@ void signal_handler() {
 void cause_seg() {
 	char* thing = NULL;
 	char b = *thing;
+	printf("%c", b);
 }
 
 int main(int argc, char **argv) {
