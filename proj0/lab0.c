@@ -13,7 +13,7 @@
 
 void signal_handler() {
     signal(SIGSEGV, SIG_DFL);
-    fprintf(stderr, "Segmentation fault due to segfault flag: %s\n", strerror(errno));
+    fprintf(stderr, "Caught segmentation fault due to segfault flag: %s\n", strerror(errno));
     exit(4);
 }
 
