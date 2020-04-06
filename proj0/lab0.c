@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
         }
         break;
       case 'o':
-        output = open(optarg, O_WRONLY | O_CREAT, 0777);
+        output = open(optarg, O_WRONLY | O_CREAT, 0666); //used to be 0777
         if (output >= 0) {
           close(1);
           dup(output);
