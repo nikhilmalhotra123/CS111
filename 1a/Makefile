@@ -9,3 +9,6 @@ build:
 
 run: build
 	./lab1a
+
+runs: build
+	./lab1a --shell=/bin/bash
