@@ -15,6 +15,8 @@ runs: build
 
 clean:
 	-@rm -f lab1a
+	-@rm -f lab1a-505103892.tar.gz
+	-@rm -rf lab1a.dSYM
 
 dist: clean build
 	tar -cvzf lab1a-505103892.tar.gz lab1a.c Makefile README

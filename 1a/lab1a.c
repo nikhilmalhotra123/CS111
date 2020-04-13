@@ -6,16 +6,31 @@
 #include <errno.h>
 #include <string.h>
 #include <poll.h>
+#include <signal.h>
 
 
 struct termios originalconfig, newconfig;
 char* exec_file;
 int pipeChild[2];
 int pipeParent[2];
-int output;
+int pid;
+int shell_flag;
 
 void restoreTerminal(void) {
   tcsetattr(STDIN_FILENO, TCSANOW, &originalconfig);
+  if (shell_flag) {
+    int status;
+    if (waitpid(pid, &status, 0) != pid) {
+      fprintf(stderr, "Waitpid error: %s\n", strerror(errno));
+      exit(1);
+    }
+    if (WIFEXITED(status)) {
+      fprintf(stderr, "SHELL EXIT SIGNAL=%d STATUS=%d\n", WTERMSIG(status), WEXITSTATUS(status));
+      exit(0);
+    }
+    fprintf(stderr, "Child process failed to terminate");
+    exit(1);
+  }
 }
 
 void setTerminal() {
@@ -85,7 +100,7 @@ void runParent() {
         temp = buf[i];
         switch(temp) {
           case '\003':
-            kill(0, SIGINT); //or should it be output
+            kill(pid, SIGINT);
             break;
           case '\004':
             close(pipeChild[1]);
@@ -158,7 +173,7 @@ void copy() {
 int main(int argc, char **argv) {
   //Process args
   int c;
-  int shell_flag = 0;
+  shell_flag = 0;
 
   while(1) {
     static struct option long_options[] = {
@@ -178,6 +193,7 @@ int main(int argc, char **argv) {
       default:
         fprintf(stderr, "Unrecognized argument\n");
         fprintf(stderr, "--shell=<program> Shell program\n");
+        exit(1);
     }
   }
 
@@ -192,12 +208,12 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Error creating parent pipe: %s\n", strerror(errno));
       exit(1);
     }
-    output = fork();
-    if (output < -1) {
+    pid = fork();
+    if (pid < -1) {
       fprintf(stderr, "Error while forking: %s\n", strerror(errno));
       exit(1);
     }
-    else if (output == 0) {
+    else if (pid == 0) {
       runChild();
     }
     else {
