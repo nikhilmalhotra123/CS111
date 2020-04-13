@@ -11,4 +11,10 @@ run: build
 	./lab1a
 
 runs: build
-	./lab1a --shell=/bin/bash
+	./lab1a --shell=ls
+
+clean:
+	-@rm -f lab1a
+
+dist: clean build
+	tar -cvzf lab1a-505103892.tar.gz lab1a.c Makefile README
