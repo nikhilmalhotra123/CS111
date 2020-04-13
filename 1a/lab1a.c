@@ -12,6 +12,7 @@ struct termios originalconfig, newconfig;
 char* exec_file;
 int pipeChild[2];
 int pipeParent[2];
+int output;
 
 void restoreTerminal(void) {
   tcsetattr(STDIN_FILENO, TCSANOW, &originalconfig);
@@ -40,11 +41,11 @@ void runChild() {
   close(pipeChild[1]); //close child output
   close(pipeParent[0]); //close input from parent
 
-  dup2(pipeChild[1], 1);
-  dup2(pipeParent[0], 0);
+  dup2(pipeChild[0], 0);
+  dup2(pipeParent[1], 1);
 
-  close(pipeChild[1]);
-  close(pipeParent[0]);
+  close(pipeChild[0]);
+  close(pipeParent[1]);
 
   char* args[2] = {exec_file, NULL};
   execvp(exec_file, args);
@@ -75,19 +76,19 @@ void runParent() {
     }
 
     if (fds[0].revents & POLLIN) {
-      fprintf(stderr, "here");
       size = read(0, &buf, 256); //keyboard input which is standard input
       if (size < 0) {
         fprintf(stderr, "Failed to read from keyboard input");
         exit(1);
       }
       for(int i = 0; i < size; i++) {
-        switch(buf[i]) {
+        temp = buf[i];
+        switch(temp) {
           case '\003':
-            //kill(); TODO: Fix this
+            kill(0, SIGINT); //or should it be output
             break;
           case '\004':
-            exit(0);
+            close(pipeChild[1]);
             break;
           case '\012':
           case '\015':
@@ -95,35 +96,34 @@ void runParent() {
             write(pipeChild[1], &lf, 1);
             break;
           default:
-            temp = buf[i];
-            write(1, &temp, size);
-            write(pipeChild[1], &buf, size);
+            write(1, &temp, 1);
+            write(pipeChild[1], &buf, 1);
             break;
         }
       }
+      memset(buf, 0, size);
     }
 
     if (fds[1].revents & POLLIN) {
-      fprintf(stderr, "here2");
-      size = read(0, &buf, 256);
+      size = read(pipeParent[0], &buf, 256);
       if (size < 0) {
-        fprintf(stderr, "Failed to read from keyboard input");
+        fprintf(stderr, "Failed to read from shell output");
         exit(1);
       }
       for(int i = 0; i < size; i++) {
-        switch(buf[i]) {
+        temp = buf[i];
+        switch(temp) {
           case '\012':
             write(1, &crlf, 2);
             break;
           default:
-            write(1, &buf, size);
+            write(1, &temp, 1);
             break;
         }
       }
+      memset(buf, 0, size);
     }
-
     if ((POLLHUP | POLLERR) & fds[1].revents) {
-      fprintf(stderr, "here3");
       exit(0);
     }
   }
@@ -134,9 +134,11 @@ void copy() {
   char buf[128];
   char crlf[2] = {'\015', '\012'};
   int size;
-  while ((size = read(STDIN_FILENO, &buf, 128)) > 0) {
+  char temp;
+  while ((size = read(0, &buf, 128)) > 0) {
     for(int i = 0; i < size; i++) {
-      switch(buf[i]) {
+      temp = buf[i];
+      switch(temp) {
         case '\004':
           exit(0);
           break;
@@ -145,10 +147,11 @@ void copy() {
           write(1, &crlf, 2);
           break;
         default:
-          write(1, &buf, size);
+          write(1, &temp, 1);
           break;
       }
     }
+    memset(buf, 0, size);
   }
 }
 
@@ -189,7 +192,7 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Error creating parent pipe: %s\n", strerror(errno));
       exit(1);
     }
-    int output = fork();
+    output = fork();
     if (output < -1) {
       fprintf(stderr, "Error while forking: %s\n", strerror(errno));
       exit(1);
