@@ -10,9 +10,6 @@ build:
 run: build
 	./lab1a
 
-runs: build
-	./lab1a --shell=ls
-
 clean:
 	-@rm -f lab1a
 	-@rm -f lab1a-505103892.tar.gz

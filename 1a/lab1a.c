@@ -1,3 +1,7 @@
+//NAME: Nikhil Malhotra
+//EMAIL: nikhilmalhotra@g.ucla.edu
+//ID: 505103892
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -7,7 +11,7 @@
 #include <string.h>
 #include <poll.h>
 #include <signal.h>
-
+#include <sys/wait.h>
 
 struct termios originalconfig, newconfig;
 char* exec_file;
@@ -28,8 +32,6 @@ void restoreTerminal(void) {
       fprintf(stderr, "SHELL EXIT SIGNAL=%d STATUS=%d\n", WTERMSIG(status), WEXITSTATUS(status));
       exit(0);
     }
-    fprintf(stderr, "Child process failed to terminate");
-    exit(1);
   }
 }
 
@@ -40,7 +42,7 @@ void setTerminal() {
   }
 
   if (tcgetattr(STDIN_FILENO, &originalconfig) != 0 || tcgetattr(STDIN_FILENO, &newconfig) != 0) {
-    printf("Error getting terminal attributes");
+    fprintf(stderr, "Error getting terminal attributes");
     exit(1);
   }
   atexit(restoreTerminal);
@@ -62,8 +64,12 @@ void runChild() {
   close(pipeChild[0]);
   close(pipeParent[1]);
 
+  //Execute program
   char* args[2] = {exec_file, NULL};
-  execvp(exec_file, args);
+  if (execvp(exec_file, args) == -1) {
+    fprintf(stderr, "Failed to execute program: %s\n", strerror(errno));
+    exit(1);
+  }
 }
 
 void runParent() {
@@ -144,8 +150,8 @@ void runParent() {
   }
 }
 
+//Regular copy
 void copy() {
-  // Copy
   char buf[128];
   char crlf[2] = {'\015', '\012'};
   int size;
@@ -197,9 +203,11 @@ int main(int argc, char **argv) {
     }
   }
 
+  //Set terminal attributes
   setTerminal();
 
   if (shell_flag) {
+    //Create pipes and fork
     if (pipe(pipeChild) != 0) {
       fprintf(stderr, "Error creating child pipe: %s\n", strerror(errno));
       exit(1);
