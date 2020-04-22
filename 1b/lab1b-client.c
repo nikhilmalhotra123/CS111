@@ -96,6 +96,11 @@ void setupCompression() {
   }
 }
 
+void cleanupCompression() {
+  deflateEnd(&from_input);
+  inflateEnd(&from_server);
+}
+
 int compression(int bytes_to_compress, char* buffer, char* compressedBuffer, int compressedBufferSize) {
   from_input.avail_in = bytes_to_compress;
   from_input.next_in = (Bytef *) buffer;
@@ -205,7 +210,10 @@ void run() {
         fprintf(stderr, "Failed to read server output");
         exit(1);
       }
-      if (log_flag) {
+if (size == 0) {
+	exit(0);
+}
+if (log_flag) {
         dprintf(logfile, "RECEIVED %d bytes: ", size);
         write(logfile, &buf, size);
         write(logfile, &crlf[1], 1);
@@ -230,7 +238,7 @@ void run() {
 int main(int argc, char **argv) {
   //Process args
   int c;
-  int port_flag 0;
+  int port_flag = 0;
   log_flag = 0;
   compress_flag = 0;
   while(1) {
@@ -241,7 +249,7 @@ int main(int argc, char **argv) {
         {0, 0, 0, 0}
     };
     int option_index = 0;
-    c = getopt_long(argc, argv, "p:l:", long_options, &option_index);
+    c = getopt_long(argc, argv, "p:", long_options, &option_index);
 
     if (c == -1)
       break;
@@ -253,11 +261,11 @@ int main(int argc, char **argv) {
         break;
       case 'l':
         logfile = open(optarg, O_WRONLY | O_CREAT, 0666);
-        if (logfile < 0) {
-          fprintf(stderr, "Failed to create/open log file: %s\n", strerror(errno));
-          exit(1);
-        }
         log_flag = 1;
+        if (logfile < 0) {
+           fprintf(stderr, "Failed to create/open log file: %s\n", strerror(errno));
+           log_flag = 0;
+        }
         break;
       case 'c':
         compress_flag = 1;
@@ -286,6 +294,7 @@ int main(int argc, char **argv) {
 
   if (compress_flag) {
     setupCompression();
+    atexit(cleanupCompression);
   }
 
   run();

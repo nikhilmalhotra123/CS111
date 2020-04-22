@@ -32,4 +32,4 @@ clean: clean-log
 	-@rm -rf lab1b-server.dSYM
 
 dist: clean build
-	tar -cvzf lab1a-505103892.tar.gz lab1a.c Makefile README
+	tar -cvzf lab1b-505103892.tar.gz lab1b-client.c lab1b-server.c Makefile README

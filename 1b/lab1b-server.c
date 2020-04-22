@@ -103,6 +103,11 @@ void setupCompression() {
   }
 }
 
+void cleanupCompression() {
+  deflateEnd(&from_shell);
+  inflateEnd(&from_client);
+}
+
 int compression(int bytes_to_compress, char* buffer, char* compressedBuffer, int compressedBufferSize) {
   from_shell.avail_in = bytes_to_compress;
   from_shell.next_in = (Bytef *) buffer;
@@ -314,7 +319,7 @@ int main(int argc, char **argv) {
   while(1) {
     static struct option long_options[] = {
         {"port",  required_argument,  0,  'p'},
-        {"shell",  optional_argument,  0,  's'},
+        {"shell",  required_argument,  0,  's'},
         {"compress",    no_argument,   0,  'c'},
         {0, 0, 0, 0}
     };
@@ -337,7 +342,7 @@ int main(int argc, char **argv) {
         compress_flag = 1;
         break;
       default:
-        fprintf(stderr, "Invalid arguments\n");
+        fprintf(stderr, "Invalid arguments2\n");
         fprintf(stderr, "--port=port#      Port Number     Required\n");
         fprintf(stderr, "--shell=<program> Shell program   Optional\n");
         fprintf(stderr, "--compress    Enable Compression  Optional");
@@ -345,7 +350,7 @@ int main(int argc, char **argv) {
     }
   }
   if (!port_flag) {
-    fprintf(stderr, "Invalid arguments\n");
+    fprintf(stderr, "Invalid arguments1\n");
     fprintf(stderr, "--port=port#      Port Number     Required\n");
     fprintf(stderr, "--shell=<program> Shell program   Optional\n");
     fprintf(stderr, "--compress    Enable Compression  Optional");
@@ -356,6 +361,7 @@ int main(int argc, char **argv) {
 
   if (compress_flag) {
     setupCompression();
+    atexit(cleanupCompression);
   }
 
   if (shell_flag) {
