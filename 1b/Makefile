@@ -21,10 +21,7 @@ client: build-client clean-log
 server: build-server
 	./lab1b-server --port=3002 --shell=bash --compress
 
-clean-log:
-	-@rm -f logfile
-
-clean: clean-log
+clean:
 	-@rm -f lab1b-client
 	-@rm -f lab1b-server
 	-@rm -f lab1b-505103892.tar.gz

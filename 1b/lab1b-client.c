@@ -210,10 +210,10 @@ void run() {
         fprintf(stderr, "Failed to read server output");
         exit(1);
       }
-if (size == 0) {
-	exit(0);
-}
-if (log_flag) {
+      if (size == 0) {
+        exit(0);
+      }
+      if (log_flag) {
         dprintf(logfile, "RECEIVED %d bytes: ", size);
         write(logfile, &buf, size);
         write(logfile, &crlf[1], 1);
