@@ -1,0 +1,16 @@
+NAME: Nikhil Malhotra
+EMAIL: nikhilmalhotra@g.ucla.edu
+ID: 505103892
+
+Serial Number: BBGW19010164
+Wifi Address: 2CF7F106A0A3
+
+my_beaglebone.jpg: A picture of me holding my BeagleBone
+
+connected.png: A screenshot showing the command prompt with the custom name I gave the board and the output of `ping google.com` to show wifi was working.
+
+copy.png: The output of the scp command I used to copy a file from my computer to the beaglebone over WiFi
+
+build_run.png: A screenshot showing the building of hello_world.c and running the executable along with its output on the BeagleBone
+
+git.png: The output of git clone along with running git status inside the cloned repository to show that git is working.
