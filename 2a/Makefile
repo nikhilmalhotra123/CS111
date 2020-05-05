@@ -5,7 +5,7 @@
 default: build
 
 build:
-	gcc lab2_add.c -o lab2_add -g -Wall -Wextra
+	gcc lab2_add.c -o lab2_add -g -Wall -Wextra -pthread
 
 run: build
 	./lab2_add --threads=10 --iterations=10000 --sync=m
