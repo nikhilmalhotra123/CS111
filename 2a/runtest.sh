@@ -93,3 +93,9 @@
 ./lab2_add --thread=4 --iterations=10000
 ./lab2_add --thread=8 --iterations=10000
 ./lab2_add --thread=12 --iterations=10000
+
+###
+./lab2_add --thread=1 --iterations=10
+./lab2_add --thread=1 --iterations=100
+./lab2_add --thread=1 --iterations=1000
+./lab2_add --thread=1 --iterations=10000
