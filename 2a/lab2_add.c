@@ -11,7 +11,7 @@ int opt_yield;
 char* protected;
 pthread_t *threads;
 long long counter;
-int runtime;
+long runtime;
 
 struct timespec start, stop;
 
@@ -123,7 +123,7 @@ void runThreads() {
       fprintf(stderr, "Failed to get time");
       exit(1);
   }
-  runtime = ((stop.tv_sec - start.tv_sec)*1000000000) + (stop.tv_nsec = start.tv_nsec);
+  runtime = ((stop.tv_sec - start.tv_sec)*1000000000) + (stop.tv_nsec - start.tv_nsec);
 }
 
 void printCustomOutput() {
@@ -147,7 +147,7 @@ void printCustomOutput() {
   strcat(tag, yield);
   strcat(tag, sync);
 
-  printf("%s,%d,%d,%d,%d,%d,%lld\n", tag, numOfThreads, iterations, operations, runtime, runtime/operations, counter);
+  printf("%s,%d,%d,%d,%ld,%ld,%lld\n", tag, numOfThreads, iterations, operations, runtime, runtime/operations, counter);
 }
 
 int main(int argc, char **argv) {
