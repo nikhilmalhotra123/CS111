@@ -5,6 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include "SortedList.h"
+#include <signal.h>
 
 int numOfThreads;
 int iterations;
