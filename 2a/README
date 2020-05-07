@@ -1,1 +1,25 @@
-Nikhil Malhotra
+NAME: Nikhil Malhotra
+EMAIL: nikhilmalhora@g.ucla.edu
+ID: 505103892
+
+lab2_add.c: This file adds and subtracts from a single shared variable to demonstrate the need for locking in multithreading.
+
+lab2_list.c: This file inserts and deletes elements from a shared list to demonstrate the need for locking in multithreading.
+
+QUESTION 2.1.1:
+With a fewer number of iterations, there is a lower chance for a race condition to occur. Since the race condition can occur at any time, when the number of iterations go up, the number of situations where the race condition can occur also increases. This is why a small number of iterations will have few chances for race conditions to occur and therefore will seldom fail.
+
+QUESTION 2.1.2:
+When running the program with the yield flag, there is a context switch everytime a thread is in the middle of updating the shared variable. Without the flag, context switches would only occur at clock interrupts. This means there are more context switches which cause much more overhead and therefore and much slower. It is not valid to get a per-operation measurement because now there is a huge additional overhead of context switching.
+
+QUESTION 2.1.3:
+There is overhead of creating threads and so this is a "fixed" time cost. As the number of operations increase, this fixed cost becomes less important and since it doesn't change with the number of iterations, the average cost per operation drops as iterations increase. To calculate the correct cost, there are a couple approaches. The first is to run the program with a very large number of iterations so the initial fixed cost becomes trivial. The other approach would be to run the code with no iterations to get the fixed cost of creating the threads and then subtract that time from the total runtime.
+
+QUESTION 2.1.4:
+When there are a few number of threads, there isn't much overlap between threads fighting for the same lock. Since threads aren't waiting on the locks as much because there aren' many threads, the wait time is small. Therefore the type of lock doesn't have much of an effect because there aren't many clashes. However as the number of threads rises, there will be more threads waiting for the lock to perform operations and having multiple threads wait for a lock wastes time and reduces the benefits of concurrency causing the operations to slow down.
+
+QUESTION 2.2.1:
+The time per operation for adding is slightly higher than the list. However while the time per operation for the list grows linearly, the time per operation for adding increases at a decreasing rate. This is most likely due to the fact that since for adding, threads only have to wait for the thread holding the lock to complete one single add or subtract whereas for the list implementation, threads have to wait for the lock holding thread to (in the worst case) scan the whole list. 
+
+QUESTION 2.2.2:
+Both locking mechanisms initially start with around the same cost per operation when the number of threads are low. For a lower number of threads, spin-locking performs better because of its simplicity. However, when the number of threads increase, spin-locking grows at an exponential rate because each thread is wasting cpu time by constantly checking if the lock is free. Mutex locks on the other hand grow at a linear rate because cpu time isn't being wasted constantly checking for the lock. Therefore, for a low number of threads spin-locking is more efficient because it is simple but as threads increase, mutex locks perform better 
