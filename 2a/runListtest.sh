@@ -1,3 +1,7 @@
+#NAME: Nikhil Malhotra
+#EMAIL: nikhilmalhotra@g.ucla.edu
+#ID: 505103892
+
 ###
 ./lab2_list --iterations=10 --thread=1
 ./lab2_list --iterations=100 --thread=1

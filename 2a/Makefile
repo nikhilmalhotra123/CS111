@@ -8,7 +8,9 @@ build:
 	gcc lab2_add.c -o lab2_add -g -Wall -Wextra -pthread
 	gcc lab2_list.c -o lab2_list -g SortedList.c -Wall -Wextra -pthread
 
-run: build
+run: run-add run-list
+
+run-add: build
 	./lab2_add --threads=10 --iterations=10000 --sync=m
 
 run-list: build
@@ -20,6 +22,13 @@ clean:
 	-@rm -f lab2a-505103892.tar.gz
 	-@rm -rf lab2_add.dSYM
 	-@rm -rf lab2_list.dSYM
+	-@rm -f lab2_add.csv
+	-@rm -f lab2_list.csv
+	-@rm -f *.png
+
+tests: build
+	./runtest.sh > lab2_add.csv
+	-./runListtest.sh > lab2_list.csv
 
 dist: clean build
-	tar -cvzf lab2a-505103892.tar.gz lab2_add.c lab2_list.c Makefile README
+	tar -cvzf lab2a-505103892.tar.gz lab2_add.c lab2_list.c Makefile README SortedList.h SortedList.c lab2_add.csv lab2_list.csv lab2_add-1.png lab2_add-2.png lab2_add-3.png lab2_add-4.png lab2_add-5.png lab2_list-1.png lab2_list-2.png lab2_list-3.png lab2_list-4.png runtest.sh runListtest.sh

@@ -1,3 +1,7 @@
+//NAME: Nikhil Malhotra
+//EMAIL: nikhilmalhotra@g.ucla.edu
+//ID: 505103892
+
 #include "SortedList.h"
 #include <string.h>
 #include <stdio.h>
