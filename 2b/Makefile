@@ -8,7 +8,7 @@ build:
 	gcc lab2_list.c -o lab2_list -g SortedList.c -Wall -Wextra -pthread
 
 run: build
-	./lab2_list --threads=1 --iterations=6 --sync=s --yield=id --lists=5
+	./lab2_list --threads=12 --iterations=6 --sync=m --yield=id --lists=5
 
 clean:
 	-@rm -f lab2_list

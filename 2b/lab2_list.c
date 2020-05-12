@@ -99,7 +99,7 @@ void* modifyList(void* arg) {
             fprintf(stderr, "Failed to get time");
             exit(1);
         }
-        pthread_mutex_lock(&mutexes[hash(elements[i].key)]);
+        pthread_mutex_lock(&mutexes[i]);
         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
             fprintf(stderr, "Failed to get time");
             exit(1);
@@ -111,7 +111,7 @@ void* modifyList(void* arg) {
           fprintf(stderr, "Error on getting length");
           exit(2);
         }
-        pthread_mutex_unlock(&mutexes[hash(elements[i].key)]);
+        pthread_mutex_unlock(&mutexes[i]);
         len += temp;
       }
       break;
@@ -121,7 +121,7 @@ void* modifyList(void* arg) {
             fprintf(stderr, "Failed to get time");
             exit(1);
         }
-        while(__sync_lock_test_and_set(&spinLocks[hash(elements[i].key)], 1));
+        while(__sync_lock_test_and_set(&spinLocks[i], 1));
         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
             fprintf(stderr, "Failed to get time");
             exit(1);
@@ -133,7 +133,7 @@ void* modifyList(void* arg) {
           fprintf(stderr, "Error on getting length");
           exit(2);
         }
-        __sync_lock_release(&spinLocks[hash(elements[i].key)]);
+        __sync_lock_release(&spinLocks[i]);
         len += temp;
       }
       break;
@@ -274,7 +274,7 @@ void printCustomOutput() {
   strcat(tag, yield);
   strcat(tag, syncString);
 
-  printf("%s,%d,%d,%d,%d,%ld,%ld\n", tag, numOfThreads, iterations, numOfLists, operations, runtime, runtime/operations);
+  printf("%s,%d,%d,%d,%d,%ld,%ld,%ld\n", tag, numOfThreads, iterations, numOfLists, operations, runtime, runtime/operations, locktime/operations);
 }
 
 int main(int argc, char **argv) {
@@ -374,11 +374,8 @@ int main(int argc, char **argv) {
     heads[i].key = NULL;
   }
 
-  fprintf(stderr, "here %d\n", numElements);
   elements = malloc(numElements * sizeof(SortedListElement_t));
-  fprintf(stderr, "here");
   for (int i = 0; i < numElements; i++) {
-    fprintf(stderr, "here");
     elements[i].key = genKey();
   }
 
