@@ -1,0 +1,5 @@
+NAME: Nikhil Malhotra
+EMAIL: nikhilmalhora@g.ucla.edu
+ID: 505103892
+
+lab2_list.c: This file inserts and deletes elements from a shared list to demonstrate the need for locking in multithreading.
