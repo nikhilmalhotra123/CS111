@@ -228,7 +228,7 @@ void runThreads() {
       fprintf(stderr, "Failed to get time");
       exit(1);
   }
-
+  
   for (int i = 0; i < numOfThreads; i++) {
     borders[i] = i;
     if(pthread_create(&threads[i], NULL, (void *) modifyList, &borders[i]) != 0) {
@@ -239,7 +239,6 @@ void runThreads() {
   for (int i = 0; i < numOfThreads; i++) {
     pthread_join(threads[i], NULL);
   }
-
   //free(threads);
 
   if(clock_gettime(CLOCK_REALTIME, &stop) == -1) {
@@ -358,11 +357,10 @@ int main(int argc, char **argv) {
         exit(1);
     }
   }
-
   signal(SIGSEGV, signal_handler);
 
   numElements = numOfThreads * iterations;
-  heads = malloc(numOfLists * sizeof(SortedList_t*));
+  heads = malloc(numOfLists * sizeof(SortedList_t));
   for (int i = 0; i < numOfLists; i++) {
     heads[i].next = &heads[i];
     heads[i].prev = &heads[i];
@@ -371,7 +369,7 @@ int main(int argc, char **argv) {
 
   elements = malloc(numElements * sizeof(SortedListElement_t));
   for (int i = 0; i < numElements; i++) {
-    elements[i].key = genKey();
+	elements[i].key = genKey();
   }
 
   switch (*syncType) {
