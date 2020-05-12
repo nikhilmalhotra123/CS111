@@ -79,7 +79,7 @@ void* modifyList(void* arg) {
             fprintf(stderr, "Failed to get time");
             exit(1);
         }
-        locktimes += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+        locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
 
         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
         __sync_lock_release(&spinLocks[hash(elements[i].key)]);
@@ -103,7 +103,7 @@ void* modifyList(void* arg) {
             fprintf(stderr, "Failed to get time");
             exit(1);
         }
-        locktimes += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+        locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
 
         int temp = SortedList_length(&heads[i]);
         if (temp == -1) {
@@ -125,7 +125,7 @@ void* modifyList(void* arg) {
             fprintf(stderr, "Failed to get time");
             exit(1);
         }
-        locktimes += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+        locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
 
         int temp = SortedList_length(&heads[i]);
         if (temp == -1) {
