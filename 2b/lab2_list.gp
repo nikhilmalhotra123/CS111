@@ -65,3 +65,63 @@ plot \
 	title 'wait-for-lock' with points lc rgb 'blue', \
      "< grep -e 'list-none-m,[0-9]*,1000,1,' lab2b_list.csv" using ($2):($7) \
 	title 'time per operation' with points lc rgb 'green'
+
+set title "List-3: Protected and Unprotected Iterations that run without failure"
+set xlabel "Threads"
+unset xrange
+set xrange [0.75:]
+unset logscale y
+set ylabel "successful iterations"
+set yrange [0:100]
+set output 'lab2b_3.png'
+plot \
+    "< grep 'list-id-none,[0-9]*,[0-9]*,4' lab2b_list.csv" using ($2):($3) \
+	with points lc rgb "red" title "unprotected", \
+    "< grep 'list-id-m,[0-9]*,[0-9]*,4' lab2b_list.csv" using ($2):($3) \
+	with points lc rgb "green" title "Mutex", \
+    "< grep 'list-id-s,[0-9]*,[0-9]*,4' lab2b_list.csv" using ($2):($3) \
+	with points lc rgb "blue" title "Spin-lock"
+
+
+
+set title "List-4: Cost per Operation Mutex vs Threads"
+set xlabel "Threads"
+set logscale x 2
+unset xrange
+set xrange [0.75:]
+unset yrange
+set ylabel "Total Operations per second"
+set logscale y 10
+set output 'lab2b_4.png'
+set key left top
+
+plot \
+     "< grep 'list-none-m,[0-9]*,1000,1,' lab2b_list.csv" using ($2):($7) \
+	title 'lists 1' with points lc rgb 'red', \
+    "< grep 'list-none-m,[0-9]*,1000,4,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 4' with points lc rgb 'green', \
+    "< grep 'list-none-m,[0-9]*,1000,8,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 8' with points lc rgb 'blue', \
+    "< grep 'list-none-m,[0-9]*,1000,16,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 16' with points lc rgb 'black',
+
+set title "List-5: Cost per Operation Spin-Lock vs Threads"
+set xlabel "Threads"
+set logscale x 2
+unset xrange
+set xrange [0.75:]
+unset yrange
+set ylabel "Total Operations per second"
+set logscale y 10
+set output 'lab2b_5.png'
+set key left top
+
+plot \
+     "< grep -e 'list-none-s,[0-9]*,1000,1,' lab2b_list.csv" using ($2):($7) \
+	title 'lists 1' with points lc rgb 'red', \
+    "< grep -e 'list-none-s,[0-9]*,1000,4,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 4' with points lc rgb 'green', \
+    "< grep -e 'list-none-s,[0-9]*,1000,8,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 8' with points lc rgb 'blue', \
+    "< grep -e 'list-none-s,[0-9]*,1000,16,' lab2b_list.csv" using ($2):($7) \
+  title 'lists 16' with points lc rgb 'black',
