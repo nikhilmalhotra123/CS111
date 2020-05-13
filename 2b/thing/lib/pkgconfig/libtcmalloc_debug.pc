@@ -1,4 +1,4 @@
-prefix=/Users/nikhilmalhotra/Desktop/CS111/2b/thing
+prefix=/u/cs/ugrad/malhotra/CS111/2b/thing
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
@@ -9,5 +9,5 @@ Description: Performance tools for C++
 URL: http://code.google.com/p/gperftools/
 Requires:
 Libs: -L${libdir} -ltcmalloc_debug
-Libs.private: -D_THREAD_SAFE  
+Libs.private: -pthread -lpthread
 Cflags: -I${includedir}
