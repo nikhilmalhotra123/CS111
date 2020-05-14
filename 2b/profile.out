@@ -1,0 +1,385 @@
+Total: 950 samples
+     838  88.2%  88.2%      949  99.9% modifyList
+      32   3.4%  91.6%       32   3.4% hash
+      28   2.9%  94.5%       28   2.9% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:165
+      12   1.3%  95.8%       53   5.6% SortedList_insert
+       6   0.6%  96.4%        6   0.6% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1721
+       5   0.5%  96.9%        5   0.5% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:130
+       5   0.5%  97.5%        5   0.5% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1729
+       4   0.4%  97.9%        4   0.4% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:160
+       4   0.4%  98.3%       26   2.7% SortedList_lookup
+       4   0.4%  98.7%        4   0.4% _init
+       2   0.2%  98.9%        2   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:202
+       2   0.2%  99.2%        2   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:204
+       2   0.2%  99.4%        2   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:205
+       2   0.2%  99.6%        2   0.2% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1730
+       1   0.1%  99.7%        1   0.1% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:203
+       1   0.1%  99.8%        1   0.1% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1714
+       1   0.1%  99.9%        1   0.1% ?? /usr/src/debug////////glibc-2.17-c758a686/string/../sysdeps/x86_64/multiarch/strcmp-sse42.S:1720
+       1   0.1% 100.0%        1   0.1% pthread_join
+       0   0.0% 100.0%      949  99.9% ?? /usr/src/debug////////glibc-2.17-c758a686/misc/../sysdeps/unix/sysv/linux/x86_64/clone.S:111
+       0   0.0% 100.0%        1   0.1% __libc_start_main
+       0   0.0% 100.0%        1   0.1% _start
+       0   0.0% 100.0%        1   0.1% main
+       0   0.0% 100.0%        1   0.1% runThreads
+       0   0.0% 100.0%      949  99.9% start_thread
+ROUTINE ====================== modifyList in /u/cs/ugrad/malhotra/CS111/2b/lab2_list.c
+   838    949 Total samples (flat / cumulative)
+     .      .   46:   key[0] = (char) (rand() % 26) + 'a';
+     .      .   47:   key[1] = '\0';
+     .      .   48:   return key;
+     .      .   49: }
+     .      .   50: 
+---
+     .      .   51: void* modifyList(void* arg) {
+     .      .   52:   int num = *((int *) arg);
+     .      .   53:   struct timespec lockstart, lockstop;
+     .      .   54: 
+     .      .   55:   for (int i = num; i < numElements; i+=numOfThreads) {
+     .      .   56:     switch (*syncType) {
+     .      .   57:       case 'm':
+     .      .   58:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   59:             fprintf(stderr, "Failed to get time");
+     .      .   60:             exit(1);
+     .      .   61:         }
+     .      .   62:         pthread_mutex_lock(&mutexes[hash(elements[i].key)]);
+     .      .   63:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .   64:             fprintf(stderr, "Failed to get time");
+     .      .   65:             exit(1);
+     .      .   66:         }
+     .      .   67:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .   68: 
+     .      .   69:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   70:         pthread_mutex_unlock(&mutexes[hash(elements[i].key)]);
+     .      .   71:         break;
+     .      .   72:       case 's':
+     .      .   73:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   74:             fprintf(stderr, "Failed to get time");
+     .      .   75:             exit(1);
+     .      .   76:         }
+   634    657   77:         while(__sync_lock_test_and_set(&spinLocks[hash(elements[i].key)], 1));
+     .      .   78:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .   79:             fprintf(stderr, "Failed to get time");
+     .      .   80:             exit(1);
+     .      .   81:         }
+     .      .   82:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .   83: 
+     .     53   84:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   85:         __sync_lock_release(&spinLocks[hash(elements[i].key)]);
+     .      .   86:         break;
+     .      .   87:       default:
+     .      .   88:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   89:         break;
+     .      .   90:     }
+     .      .   91:   }
+     .      .   92: 
+     .      .   93:   int len = 0;
+     .      .   94:   switch (*syncType) {
+     .      .   95:     case 'm':
+     .      .   96:       for (int i = 0; i < numOfLists; i++) {
+     .      .   97:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   98:             fprintf(stderr, "Failed to get time");
+     .      .   99:             exit(1);
+     .      .  100:         }
+     .      .  101:         pthread_mutex_lock(&mutexes[i]);
+     .      .  102:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  103:             fprintf(stderr, "Failed to get time");
+     .      .  104:             exit(1);
+     .      .  105:         }
+     .      .  106:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  107: 
+     .      .  108:         int temp = SortedList_length(&heads[i]);
+     .      .  109:         if (temp == -1) {
+     .      .  110:           fprintf(stderr, "Error on getting length");
+     .      .  111:           exit(2);
+     .      .  112:         }
+     .      .  113:         pthread_mutex_unlock(&mutexes[i]);
+     .      .  114:         len += temp;
+     .      .  115:       }
+     .      .  116:       break;
+     .      .  117:     case 's':
+     .      .  118:       for (int i = 0; i < numOfLists; i++) {
+     .      .  119:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  120:             fprintf(stderr, "Failed to get time");
+     .      .  121:             exit(1);
+     .      .  122:         }
+     .      .  123:         while(__sync_lock_test_and_set(&spinLocks[i], 1));
+     .      .  124:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  125:             fprintf(stderr, "Failed to get time");
+     .      .  126:             exit(1);
+     .      .  127:         }
+     .      .  128:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  129: 
+     .      .  130:         int temp = SortedList_length(&heads[i]);
+     .      .  131:         if (temp == -1) {
+     .      .  132:           fprintf(stderr, "Error on getting length");
+     .      .  133:           exit(2);
+     .      .  134:         }
+     .      .  135:         __sync_lock_release(&spinLocks[i]);
+     .      .  136:         len += temp;
+     .      .  137:       }
+     .      .  138:       break;
+     .      .  139:     default:
+     .      .  140:       for (int i = 0; i < numOfLists; i++) {
+     .      .  141:         int temp = SortedList_length(&heads[i]);
+     .      .  142:         if (temp == -1) {
+     .      .  143:           fprintf(stderr, "Error on getting length");
+     .      .  144:           exit(2);
+     .      .  145:         }
+     .      .  146:         len += temp;
+     .      .  147:       }
+     .      .  148:       break;
+     .      .  149:   }
+     .      .  150: 
+     .      .  151: 
+     .      .  152:   SortedListElement_t* search;
+     .      .  153:   for (int i = num; i < numElements; i+=numOfThreads) {
+     .      .  154:     switch (*syncType) {
+     .      .  155:       case 'm':
+     .      .  156:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  157:             fprintf(stderr, "Failed to get time");
+     .      .  158:             exit(1);
+     .      .  159:         }
+     .      .  160:         pthread_mutex_lock(&mutexes[hash(elements[i].key)]);
+     .      .  161:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  162:             fprintf(stderr, "Failed to get time");
+     .      .  163:             exit(1);
+     .      .  164:         }
+     .      .  165:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  166: 
+     .      .  167:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  168:         if (search == NULL) {
+     .      .  169:           fprintf(stderr, "Error on lookup");
+     .      .  170:           exit(2);
+     .      .  171:         }
+     .      .  172:         if (SortedList_delete(search)) {
+     .      .  173:           fprintf(stderr, "Error deleting element");
+     .      .  174:           exit(2);
+     .      .  175:         }
+     .      .  176:         pthread_mutex_unlock(&mutexes[hash(elements[i].key)]);
+     .      .  177:         break;
+     .      .  178:       case 's':
+     .      .  179:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  180:             fprintf(stderr, "Failed to get time");
+     .      .  181:             exit(1);
+     .      .  182:         }
+   204    213  183:         while(__sync_lock_test_and_set(&spinLocks[hash(elements[i].key)], 1));
+     .      .  184:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  185:             fprintf(stderr, "Failed to get time");
+     .      .  186:             exit(1);
+     .      .  187:         }
+     .      .  188:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  189: 
+     .     26  190:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  191:         if (search == NULL) {
+     .      .  192:           fprintf(stderr, "Error on lookup");
+     .      .  193:           exit(2);
+     .      .  194:         }
+     .      .  195:         if (SortedList_delete(search)) {
+     .      .  196:           fprintf(stderr, "Error deleting element");
+     .      .  197:           exit(2);
+     .      .  198:         }
+     .      .  199:         __sync_lock_release(&spinLocks[hash(elements[i].key)]);
+     .      .  200:         break;
+     .      .  201:       default:
+     .      .  202:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  203:         if (search == NULL) {
+     .      .  204:           fprintf(stderr, "Error on lookup");
+     .      .  205:           exit(2);
+     .      .  206:         }
+     .      .  207:         if (SortedList_delete(search)) {
+     .      .  208:           fprintf(stderr, "Error deleting element");
+     .      .  209:           exit(2);
+     .      .  210:         }
+     .      .  211:         break;
+     .      .  212:     }
+     .      .  213:     //free(list[i].key);
+     .      .  214:   }
+     .      .  215:   return NULL;
+     .      .  216: }
+---
+     .      .  217: 
+     .      .  218: void runThreads() {
+     .      .  219: 
+     .      .  220:   threads = malloc(sizeof(pthread_t)*numOfThreads);
+     .      .  221:   if (threads == NULL) {
+ROUTINE ====================== modifyList in /u/cs/ugrad/malhotra/CS111/2b/lab2_list.c
+   838    949 Total samples (flat / cumulative)
+     .      .   46:   key[0] = (char) (rand() % 26) + 'a';
+     .      .   47:   key[1] = '\0';
+     .      .   48:   return key;
+     .      .   49: }
+     .      .   50: 
+---
+     .      .   51: void* modifyList(void* arg) {
+     .      .   52:   int num = *((int *) arg);
+     .      .   53:   struct timespec lockstart, lockstop;
+     .      .   54: 
+     .      .   55:   for (int i = num; i < numElements; i+=numOfThreads) {
+     .      .   56:     switch (*syncType) {
+     .      .   57:       case 'm':
+     .      .   58:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   59:             fprintf(stderr, "Failed to get time");
+     .      .   60:             exit(1);
+     .      .   61:         }
+     .      .   62:         pthread_mutex_lock(&mutexes[hash(elements[i].key)]);
+     .      .   63:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .   64:             fprintf(stderr, "Failed to get time");
+     .      .   65:             exit(1);
+     .      .   66:         }
+     .      .   67:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .   68: 
+     .      .   69:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   70:         pthread_mutex_unlock(&mutexes[hash(elements[i].key)]);
+     .      .   71:         break;
+     .      .   72:       case 's':
+     .      .   73:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   74:             fprintf(stderr, "Failed to get time");
+     .      .   75:             exit(1);
+     .      .   76:         }
+   634    657   77:         while(__sync_lock_test_and_set(&spinLocks[hash(elements[i].key)], 1));
+     .      .   78:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .   79:             fprintf(stderr, "Failed to get time");
+     .      .   80:             exit(1);
+     .      .   81:         }
+     .      .   82:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .   83: 
+     .     53   84:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   85:         __sync_lock_release(&spinLocks[hash(elements[i].key)]);
+     .      .   86:         break;
+     .      .   87:       default:
+     .      .   88:         SortedList_insert(&heads[hash(elements[i].key)], &elements[i]);
+     .      .   89:         break;
+     .      .   90:     }
+     .      .   91:   }
+     .      .   92: 
+     .      .   93:   int len = 0;
+     .      .   94:   switch (*syncType) {
+     .      .   95:     case 'm':
+     .      .   96:       for (int i = 0; i < numOfLists; i++) {
+     .      .   97:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .   98:             fprintf(stderr, "Failed to get time");
+     .      .   99:             exit(1);
+     .      .  100:         }
+     .      .  101:         pthread_mutex_lock(&mutexes[i]);
+     .      .  102:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  103:             fprintf(stderr, "Failed to get time");
+     .      .  104:             exit(1);
+     .      .  105:         }
+     .      .  106:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  107: 
+     .      .  108:         int temp = SortedList_length(&heads[i]);
+     .      .  109:         if (temp == -1) {
+     .      .  110:           fprintf(stderr, "Error on getting length");
+     .      .  111:           exit(2);
+     .      .  112:         }
+     .      .  113:         pthread_mutex_unlock(&mutexes[i]);
+     .      .  114:         len += temp;
+     .      .  115:       }
+     .      .  116:       break;
+     .      .  117:     case 's':
+     .      .  118:       for (int i = 0; i < numOfLists; i++) {
+     .      .  119:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  120:             fprintf(stderr, "Failed to get time");
+     .      .  121:             exit(1);
+     .      .  122:         }
+     .      .  123:         while(__sync_lock_test_and_set(&spinLocks[i], 1));
+     .      .  124:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  125:             fprintf(stderr, "Failed to get time");
+     .      .  126:             exit(1);
+     .      .  127:         }
+     .      .  128:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  129: 
+     .      .  130:         int temp = SortedList_length(&heads[i]);
+     .      .  131:         if (temp == -1) {
+     .      .  132:           fprintf(stderr, "Error on getting length");
+     .      .  133:           exit(2);
+     .      .  134:         }
+     .      .  135:         __sync_lock_release(&spinLocks[i]);
+     .      .  136:         len += temp;
+     .      .  137:       }
+     .      .  138:       break;
+     .      .  139:     default:
+     .      .  140:       for (int i = 0; i < numOfLists; i++) {
+     .      .  141:         int temp = SortedList_length(&heads[i]);
+     .      .  142:         if (temp == -1) {
+     .      .  143:           fprintf(stderr, "Error on getting length");
+     .      .  144:           exit(2);
+     .      .  145:         }
+     .      .  146:         len += temp;
+     .      .  147:       }
+     .      .  148:       break;
+     .      .  149:   }
+     .      .  150: 
+     .      .  151: 
+     .      .  152:   SortedListElement_t* search;
+     .      .  153:   for (int i = num; i < numElements; i+=numOfThreads) {
+     .      .  154:     switch (*syncType) {
+     .      .  155:       case 'm':
+     .      .  156:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  157:             fprintf(stderr, "Failed to get time");
+     .      .  158:             exit(1);
+     .      .  159:         }
+     .      .  160:         pthread_mutex_lock(&mutexes[hash(elements[i].key)]);
+     .      .  161:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  162:             fprintf(stderr, "Failed to get time");
+     .      .  163:             exit(1);
+     .      .  164:         }
+     .      .  165:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  166: 
+     .      .  167:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  168:         if (search == NULL) {
+     .      .  169:           fprintf(stderr, "Error on lookup");
+     .      .  170:           exit(2);
+     .      .  171:         }
+     .      .  172:         if (SortedList_delete(search)) {
+     .      .  173:           fprintf(stderr, "Error deleting element");
+     .      .  174:           exit(2);
+     .      .  175:         }
+     .      .  176:         pthread_mutex_unlock(&mutexes[hash(elements[i].key)]);
+     .      .  177:         break;
+     .      .  178:       case 's':
+     .      .  179:         if(clock_gettime(CLOCK_REALTIME, &lockstart) == -1) {
+     .      .  180:             fprintf(stderr, "Failed to get time");
+     .      .  181:             exit(1);
+     .      .  182:         }
+   204    213  183:         while(__sync_lock_test_and_set(&spinLocks[hash(elements[i].key)], 1));
+     .      .  184:         if(clock_gettime(CLOCK_REALTIME, &lockstop) == -1) {
+     .      .  185:             fprintf(stderr, "Failed to get time");
+     .      .  186:             exit(1);
+     .      .  187:         }
+     .      .  188:         locktime += ((lockstop.tv_sec - lockstart.tv_sec)*1000000000) + (lockstop.tv_nsec - lockstart.tv_nsec);
+     .      .  189: 
+     .     26  190:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  191:         if (search == NULL) {
+     .      .  192:           fprintf(stderr, "Error on lookup");
+     .      .  193:           exit(2);
+     .      .  194:         }
+     .      .  195:         if (SortedList_delete(search)) {
+     .      .  196:           fprintf(stderr, "Error deleting element");
+     .      .  197:           exit(2);
+     .      .  198:         }
+     .      .  199:         __sync_lock_release(&spinLocks[hash(elements[i].key)]);
+     .      .  200:         break;
+     .      .  201:       default:
+     .      .  202:         search = SortedList_lookup(&heads[hash(elements[i].key)], elements[i].key);
+     .      .  203:         if (search == NULL) {
+     .      .  204:           fprintf(stderr, "Error on lookup");
+     .      .  205:           exit(2);
+     .      .  206:         }
+     .      .  207:         if (SortedList_delete(search)) {
+     .      .  208:           fprintf(stderr, "Error deleting element");
+     .      .  209:           exit(2);
+     .      .  210:         }
+     .      .  211:         break;
+     .      .  212:     }
+     .      .  213:     //free(list[i].key);
+     .      .  214:   }
+     .      .  215:   return NULL;
+     .      .  216: }
+---
+     .      .  217: 
+     .      .  218: void runThreads() {
+     .      .  219: 
+     .      .  220:   threads = malloc(sizeof(pthread_t)*numOfThreads);
+     .      .  221:   if (threads == NULL) {

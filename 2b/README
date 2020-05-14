@@ -1,0 +1,20 @@
+NAME: Nikhil Malhotra
+EMAIL: nikhilmalhora@g.ucla.edu
+ID: 505103892
+
+lab2_list.c: This file inserts and deletes elements from a shared list to demonstrate the need for locking in multithreading.
+
+QUESTION 2.3.1:
+When there are a few number of threads, the majority of the CPU time is spend inserting and deleting elements from the Sorted List. Since there are not many threads, each thread doesn't have to spend much time (if any) waiting for the locks and so can spend most of their time performing the operations.
+
+For high thread spin-lock tests, most of the CPU time is spent "spinning"/waiting for the spin-lock to be released. For high thread mutex tests however, the CPU still spends most of its time performing operations because waiting on the mutex lock doesn't take up CPU cycles whereas waiting on the spin-lock does.
+
+QUESTION 2.3.2:
+The while loop that waits for the spin-lock to be available (lines 77, 123, and 183) take the most amount of CPU time. By looking at the profile.out file, those lines took up almost all of the CPU time in the modifyList method. These operations become more expensive as the number of threads increase because there are more threads waiting for the same locks and so they will be spending more time in the while loop waiting for the lock to become available.
+
+QUESTION 2.3.3:
+The average lock-wait time rises dramatically with an increase in the number of threads because there are now more threads waiting for the same number of locks and so the wait time will increase for each thread. The average time per operation increases because there are more threads and so there is more overhead from context switching. The average lock-wait time increases faster than the average time per operation because operations are always being performed but while they are being performed, multiple threads could be waiting for that lock and therefore the wait time will be more than the operation time for that operation.
+
+QUESTION 2.3.4:
+As the number of lists increase, the total operations per second increases due to less competition for the same locks. However, this will no be the case forever. Once the number of lists is large enough, there will be almost no competition between threads for the same lock and therefore increasing the number of lists at that point will not change the throughput.
+The throughput of an N-way partitioned list is not equivalent to the throughput of a single list with (1/N) threads. This is because an N-way partitioned list will have more overhead of context switching between threads and waiting for locks.
