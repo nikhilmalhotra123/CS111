@@ -1,4 +1,4 @@
-#! /usr/local/cs/bin/gnuplot
+#! /usr/local/bin/gnuplot
 #
 # purpose:
 #	 generate data reduction graphs for the multi-threaded list project
@@ -93,16 +93,16 @@ unset yrange
 set ylabel "Total Operations per second"
 set logscale y 10
 set output 'lab2b_4.png'
-set key left top
+set key right top
 
 plot \
-     "< grep 'list-none-m,[0-9]*,1000,1,' lab2b_list.csv" using ($2):($7) \
+     "< grep 'list-none-m,[0-9]*,1000,1,' lab2b_list.csv" using ($2):(1000000000/($7)) \
 	title 'lists 1' with points lc rgb 'red', \
-    "< grep 'list-none-m,[0-9]*,1000,4,' lab2b_list.csv" using ($2):($7) \
+    "< grep 'list-none-m,[0-9]*,1000,4,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 4' with points lc rgb 'green', \
-    "< grep 'list-none-m,[0-9]*,1000,8,' lab2b_list.csv" using ($2):($7) \
+    "< grep 'list-none-m,[0-9]*,1000,8,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 8' with points lc rgb 'blue', \
-    "< grep 'list-none-m,[0-9]*,1000,16,' lab2b_list.csv" using ($2):($7) \
+    "< grep 'list-none-m,[0-9]*,1000,16,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 16' with points lc rgb 'black',
 
 set title "List-5: Cost per Operation Spin-Lock vs Threads"
@@ -114,14 +114,14 @@ unset yrange
 set ylabel "Total Operations per second"
 set logscale y 10
 set output 'lab2b_5.png'
-set key left top
+set key right top
 
 plot \
-     "< grep -e 'list-none-s,[0-9]*,1000,1,' lab2b_list.csv" using ($2):($7) \
+     "< grep -e 'list-none-s,[0-9]*,1000,1,' lab2b_list.csv" using ($2):(1000000000/($7)) \
 	title 'lists 1' with points lc rgb 'red', \
-    "< grep -e 'list-none-s,[0-9]*,1000,4,' lab2b_list.csv" using ($2):($7) \
+    "< grep -e 'list-none-s,[0-9]*,1000,4,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 4' with points lc rgb 'green', \
-    "< grep -e 'list-none-s,[0-9]*,1000,8,' lab2b_list.csv" using ($2):($7) \
+    "< grep -e 'list-none-s,[0-9]*,1000,8,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 8' with points lc rgb 'blue', \
-    "< grep -e 'list-none-s,[0-9]*,1000,16,' lab2b_list.csv" using ($2):($7) \
+    "< grep -e 'list-none-s,[0-9]*,1000,16,' lab2b_list.csv" using ($2):(1000000000/($7)) \
   title 'lists 16' with points lc rgb 'black',
