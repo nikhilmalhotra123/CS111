@@ -1,0 +1,7 @@
+NAME: Nikhil Malhotra
+EMAIL: nikhilmalhotra@g.ucla.edu
+ID: 505103892
+
+lab4b.c: This file runs on an embedded system and will output the temperature (either in F or C) at a period specified by the user. The user can also pass commands to standard input to pause or continue the sampling as well as change the period and frequency. The file also has the option to output results to a log file.
+
+smoketest.sh: This file contains test cases for lab4b.c to make sure the embedded system has working sensors and the file can run.
