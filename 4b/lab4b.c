@@ -68,9 +68,6 @@ void handleCommand(char* buf) {
       dprintf(logfile, "START\n");
     }
   }
-  else if (strncmp(buf, "LOG", 3) == 0 && logflag) {
-    dprintf(logfile, "%s\n", buf);
-  }
   else if (strcmp(buf, "OFF") == 0) {
     if (logflag) {
       dprintf(logfile, "OFF\n");
@@ -85,6 +82,9 @@ void handleCommand(char* buf) {
       }
       period = newPeriod;
     }
+  }
+  else if (logflag) {
+    dprintf(logfile, "%s\n", buf);
   }
 }
 
